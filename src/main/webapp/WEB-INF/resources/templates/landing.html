@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+    <title>API Sample</title>
+  </head>
+  <body>
+    <b>Hello, {{ name|default("World") }}!</b>
+    <div class="messages">
+      {% for message in messages -%}
+        <div class="message" data-kind="{{ message.key.kind }}" data-key="{{ message.key.encoded }}">
+          <div class="name">{{ message.data.name }}</div>
+          <div class="message">{{ message.data.message }}</div>
+        </div>
+      {% else %}
+        <div class="no-messages">
+          <b>There are no guestbook messages yet.</b>
+        </div>
+      {% endfor %}
+    </div>
+  </body>
+</html>

@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appengine-web-app xmlns="http://appengine.google.com/ns/1.0">
     <application>mm-api-demo</application>
-    <version>v1</version>
+    <version>v2</version>
     <threadsafe>true</threadsafe>
 
+    <ssl-enabled>true</ssl-enabled>
+    <auto-id-policy>default</auto-id-policy>
+    <sessions-enabled>false</sessions-enabled>
+    <precompilation-enabled>false</precompilation-enabled>
+    <warmup-requests-enabled>true</warmup-requests-enabled>
+    <async-session-persistence enabled="true" queue-name="session"/>
+
+    <inbound-services>
+        <service>warmup</service>
+    </inbound-services>
+
+    <automatic-scaling>
+        <min-idle-instances>1</min-idle-instances>
+        <max-idle-instances>3</max-idle-instances>
+        <min-pending-latency>100ms</min-pending-latency>
+        <max-pending-latency>120ms</max-pending-latency>
+        <max-concurrent-requests>10</max-concurrent-requests>
+    </automatic-scaling>
+
+    <instance-class>F1</instance-class>
+
+    <resource-files>
+        <include path="resources/**"/>
+        <include path="resources/templates/**"/>
+        <include path="WEB-INF/**"/>
+    </resource-files>
+
     <system-properties>
+        <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
+        <property name="mm.project" value="mm-api-demo"/>
+        <property name="mm.k9.runtime.salt" value="xjvbxzhvc*#!(G@!H@pichug"/>
+        <property name="mm.k9.runtime.container" value="appengine"/>
+        <property name="mm.k9.runtime.container.token" value="xhcvihyv2iuvcn2lb1221ujnbv"/>
+        <property name="mm.k9.google.service.key" value="WEB-INF/resources/credentials/Service.p12"/>
         <property name="java.util.logging.config.file" value="WEB-INF/logging.properties"/>
     </system-properties>
 </appengine-web-app>
