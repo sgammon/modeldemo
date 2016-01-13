@@ -60,7 +60,7 @@ public abstract class AppModel {
     return modified;
   }
 
-  /** -- serialization -- **/
+  /** -- schema & codec -- **/
   public Map<String, Object> flatten() {
     return datastore().save().toEntity(this).getProperties();
   }
@@ -69,7 +69,6 @@ public abstract class AppModel {
     return new SerializedModel(this);
   }
 
-  /** -- deserialization -- **/
   public static AppModel deserialize(SerializedModel model) {
     throw new RuntimeException("Deserializing models is not yet supported.");
   }

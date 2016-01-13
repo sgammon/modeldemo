@@ -7,8 +7,6 @@ import com.googlecode.objectify.annotation.*;
 import io.protostuff.Tag;
 import org.apache.avro.reflect.Nullable;
 
-import java.util.Date;
-
 
 /**
  * Created by sam on 1/12/16.
