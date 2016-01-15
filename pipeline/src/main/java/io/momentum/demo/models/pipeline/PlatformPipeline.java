@@ -3,6 +3,7 @@ package io.momentum.demo.models.pipeline;
 
 import com.google.api.services.bigquery.model.TableReference;
 import com.google.cloud.dataflow.sdk.Pipeline;
+import com.google.cloud.dataflow.sdk.coders.CoderRegistry;
 import com.google.cloud.dataflow.sdk.options.DataflowPipelineOptions;
 import com.google.cloud.dataflow.sdk.options.GcpOptions;
 import com.google.cloud.dataflow.sdk.options.PipelineOptions;
@@ -11,7 +12,9 @@ import com.google.cloud.dataflow.sdk.runners.BlockingDataflowPipelineRunner;
 import com.google.cloud.dataflow.sdk.runners.DataflowPipelineRunner;
 import com.google.cloud.dataflow.sdk.runners.DirectPipelineRunner;
 
+import io.momentum.demo.models.pipeline.coder.ModelCoder;
 import io.momentum.demo.models.pipeline.options.*;
+import io.momentum.demo.models.schema.AppModel;
 
 import java.io.IOException;
 import java.util.Arrays;

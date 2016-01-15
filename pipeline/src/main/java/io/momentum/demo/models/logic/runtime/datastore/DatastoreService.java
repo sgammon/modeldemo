@@ -5,7 +5,10 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import io.momentum.demo.models.schema.AppModel;
 import io.momentum.demo.models.schema.UserMessage;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -13,6 +16,7 @@ import io.momentum.demo.models.schema.UserMessage;
  */
 public final class DatastoreService {
   private static boolean initialized = false;
+  private static ConcurrentHashMap<String, Class<? extends AppModel>> modelMap = new ConcurrentHashMap<>();
 
   static {
     initialize();
@@ -27,9 +31,20 @@ public final class DatastoreService {
     return ObjectifyService.factory();
   }
 
+  public static void register(Class<? extends AppModel> modelClass) {
+    if (modelMap.containsKey(modelClass.getSimpleName()))
+      throw new RuntimeException("cannot register model with duplicate name `" + modelClass.getSimpleName() + "`.");
+    modelMap.put(modelClass.getSimpleName(), modelClass);
+    factory().register(modelClass);
+  }
+
+  public static Class<? extends AppModel> resolve(String kind) {
+    return modelMap.get(kind);
+  }
+
   public static void initialize() {
     if (!initialized) {
-      factory().register(UserMessage.class);
+      register(UserMessage.class);
 
       initialized = true;
     }

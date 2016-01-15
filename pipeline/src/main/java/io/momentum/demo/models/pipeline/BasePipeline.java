@@ -38,9 +38,9 @@ public abstract class BasePipeline {
   protected abstract Pipeline collapse(Pipeline pipeline);
   protected abstract PipelineOptions prepare(String[] args, Class<? extends PipelineOptions> optionsType) throws IOException;
 
-  protected static PCollection<String> window(FixedWindowOptions options,
-                                              PCollection<String> stream) {
-    return stream.apply(Window.<String>into(FixedWindows.of(Duration.standardMinutes(options.getFixedWindowDuration())))
+  protected static <T> PCollection<T> window(FixedWindowOptions options,
+                                             PCollection<T> stream) {
+    return stream.apply(Window.<T>into(FixedWindows.of(Duration.standardMinutes(options.getFixedWindowDuration())))
                               .named("Fixed " + String.valueOf(options.getFixedWindowDuration()) + "-minute windows"));
   }
 }

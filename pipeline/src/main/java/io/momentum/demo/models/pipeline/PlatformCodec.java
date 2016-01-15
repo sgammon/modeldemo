@@ -10,10 +10,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * Created by sam on 1/12/16.
  */
 public final class PlatformCodec {
-  public static ObjectMapper jsonWriter = new ObjectMapper();
-  public static ObjectMapper jsonReader = new ObjectMapper();
+  public ObjectMapper jsonWriter = new ObjectMapper();
+  public ObjectMapper jsonReader = new ObjectMapper();
 
-  static {
+  public PlatformCodec() {
+    // apply default settings
     jsonWriter.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
     jsonReader.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
   }

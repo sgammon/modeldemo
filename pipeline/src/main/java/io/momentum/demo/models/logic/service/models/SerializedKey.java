@@ -1,20 +1,24 @@
 package io.momentum.demo.models.logic.service.models;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.googlecode.objectify.Key;
+
+import java.io.Serializable;
 
 
 /**
  * Created by sam on 1/12/16.
  */
-public final class SerializedKey extends SerializedDatastoreObject {
+public final class SerializedKey extends SerializedDatastoreObject implements Serializable {
   /** -- properties -- **/
-  public final String kind;
-  public final String encoded;
+  public final @JsonProperty("encoded") String encoded;
 
   /** -- constructors -- **/
-  private SerializedKey(String kind, String encoded) {
-    this.kind = kind;
+  @JsonCreator
+  public SerializedKey(@JsonProperty("encoded") String encoded) {
     this.encoded = encoded;
   }
 
@@ -25,12 +29,13 @@ public final class SerializedKey extends SerializedDatastoreObject {
   }
 
   public static SerializedKey fromKey(Key key) {
-    return new SerializedKey(key.getKind(), key.toWebSafeString());
+    return new SerializedKey(key.toWebSafeString());
   }
 
   /** -- getters / setters -- **/
+  @JsonIgnore
   public String getKind() {
-    return kind;
+    return Key.create(encoded).getKind();
   }
 
   public String getEncoded() {

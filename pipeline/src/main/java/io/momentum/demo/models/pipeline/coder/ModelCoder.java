@@ -1,59 +1,57 @@
 package io.momentum.demo.models.pipeline.coder;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.cloud.dataflow.sdk.coders.*;
+import com.google.cloud.dataflow.sdk.util.CloudObject;
 
-import com.google.cloud.dataflow.sdk.coders.AvroCoder;
-import com.google.cloud.dataflow.sdk.coders.Coder;
-import com.google.cloud.dataflow.sdk.coders.StandardCoder;
-
-import io.momentum.demo.models.logic.service.models.SerializedModel;
 import io.momentum.demo.models.schema.AppModel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
+import java.io.*;
 
 
 /**
  * Created by sam on 1/13/16.
  */
-public final class ModelCoder<M extends AppModel> extends StandardCoder<M> {
-  private final Class<M> modelType;
-  private final AvroCoder<SerializedModel> avroCoder = AvroCoder.of(SerializedModel.class);
-
-  private ModelCoder(Class<M> modelType) {
-    this.modelType = modelType;
+public final class ModelCoder<M extends AppModel> extends AtomicCoder<M> {
+  public static <T extends AppModel> ModelCoder<T> of(Class<T> clazz) {
+    return new ModelCoder<>(clazz);
   }
 
-  public static <M extends AppModel> ModelCoder<M> of(Class<M> klass) {
-    return new ModelCoder<>(klass);
+  @JsonCreator
+  @SuppressWarnings("unchecked")
+  public static ModelCoder<?> of(@JsonProperty("kind") String classType) throws ClassNotFoundException {
+    Class<?> clazz = Class.forName(classType);
+    return of((Class<? extends AppModel>) clazz);
   }
 
-  @Override
-  public List<? extends Coder<?>> getCoderArguments() {
-    return avroCoder.getCoderArguments();
-  }
+  private String kind;
 
-  public byte[] encode(M modelObj) throws IOException {
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    encode(modelObj, outputStream, Context.OUTER);
-    return outputStream.toByteArray();
+  public ModelCoder(Class<M> type) {
+    this.kind = type.getSimpleName();
   }
 
   @Override
-  public void encode(M modelObj, OutputStream outputStream, Context context) throws IOException {
-    avroCoder.encode(modelObj.serialize(true), outputStream, context);
+  public void encode(M value, OutputStream outStream, Context context) throws IOException, CoderException {
+    CoderInternals.encode(value, outStream, context, new TypeReference<TypedSerializedModel<M>>() { });
   }
 
   @Override
-  public M decode(InputStream inputStream, Context context) throws IOException {
-    SerializedModel deserialized = avroCoder.decode(inputStream, context);
-    return AppModel.deserialize(deserialized);
+  public M decode(InputStream inStream, Context context) throws IOException, CoderException {
+    return CoderInternals.decode(inStream, context, new TypeReference<TypedSerializedModel<M>>() { });
   }
 
   @Override
-  public void verifyDeterministic() throws NonDeterministicException {
-    avroCoder.verifyDeterministic();
+  public String getEncodingId() {
+    return CoderInternals.encodingId();
+  }
+
+  @Override
+  public CloudObject asCloudObject() {
+    CloudObject co = super.asCloudObject();
+    co.set("kind", kind);
+    return co;
   }
 }

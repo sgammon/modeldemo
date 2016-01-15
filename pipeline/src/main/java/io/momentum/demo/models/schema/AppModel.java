@@ -1,33 +1,41 @@
 package io.momentum.demo.models.schema;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.api.server.spi.config.ApiTransformer;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
-import com.google.appengine.api.datastore.*;
 import com.google.cloud.dataflow.sdk.coders.AvroCoder;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
 import com.googlecode.objectify.*;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.*;
 
-import com.googlecode.objectify.annotation.Index;
+import com.googlecode.objectify.impl.EntityMetadata;
+import com.googlecode.objectify.impl.KeyMetadata;
 import io.protostuff.Tag;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
+import com.googlecode.objectify.annotation.Index;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.apache.avro.Schema;
+import org.apache.commons.beanutils.BeanUtils;
 
 import io.momentum.demo.models.logic.runtime.datastore.DatastoreService;
 import io.momentum.demo.models.logic.service.models.SerializedModel;
 import io.momentum.demo.models.logic.service.transformers.ModelTransformer;
+import io.momentum.demo.models.pipeline.PlatformCodec;
 import io.momentum.demo.models.pipeline.coder.ModelCoder;
+import io.momentum.demo.models.pipeline.coder.TypedSerializedModel;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.logging.Logger;
 
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import static com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 
@@ -37,8 +45,9 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 @DefaultCoder(ModelCoder.class)
 @ApiTransformer(ModelTransformer.class)
 @JsonInclude(value = Include.ALWAYS)
-@JsonTypeInfo(use = Id.MINIMAL_CLASS, include = As.PROPERTY, property = "kind")
-public abstract class AppModel {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
+public abstract class AppModel implements Serializable {
+  private static final PlatformCodec codec = new PlatformCodec();
   private static final Logger logging = Logger.getLogger(AppModel.class.getSimpleName());
 
   private enum FieldType {
@@ -84,13 +93,11 @@ public abstract class AppModel {
   /** -- properties -- **/
   // timestamp for creation
   @Tag(value = 1, alias = "c")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  public @Index Date created;
+  public @Index @JsonProperty("created") Date created;
 
   // timestamp for modification
   @Tag(value = 2, alias = "m")
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-  public @Index Date modified;
+  public @Index @JsonProperty("modified") Date modified;
 
   /** -- lifecycle -- **/
   public @OnSave void updateTimestamps() {
@@ -109,6 +116,10 @@ public abstract class AppModel {
   }
 
   /** -- schema & codec -- **/
+  public String kind() {
+    return Key.create(this.getClass(), "1").getKind();
+  }
+
   public Map<String, Object> flatten(boolean removeNulls) {
     Map<String, Object> obj = datastore().save().toEntity(this).getProperties();
     if (removeNulls) {
@@ -129,6 +140,52 @@ public abstract class AppModel {
 
   public SerializedModel serialize(boolean removeNulls) {
     return new SerializedModel(this, removeNulls);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <M extends AppModel> M deserialize(String kind, JsonNode node, TypeReference<M> ref, TypedSerializedModel<M> serialized) {
+    // inflate key, attach, and deserialize
+    try {
+      datastore();
+      Class<M> modelClass = (Class<M>)DatastoreService.resolve(kind);
+      if (modelClass == null) throw new RuntimeException("unable to resolve model class: '" + kind + "'");
+
+      // inflate data according to kind schema
+      M modelObj = codec.getReader()
+                        .treeToValue(node, modelClass);
+
+      if (serialized.getKey() != null) {
+        // object has a key: inflate the key
+        Key<M> targetKey = Key.create(serialized.getKey()
+                                             .getEncoded());
+        EntityMetadata<M> metadata = datastore().factory().getMetadata(targetKey);
+        KeyMetadata<M> keyMetadata = metadata.getKeyMetadata();
+
+        // set ID
+        Class<?> idType = keyMetadata.getIdFieldType();
+
+        try {
+          if (idType.isAssignableFrom(String.class)) {
+            // it's a string keyname
+            BeanUtils.setProperty(modelObj, keyMetadata.getIdFieldName(), targetKey.getName());
+          } else {
+            // it's either a native or boxed `long`
+            BeanUtils.setProperty(modelObj, keyMetadata.getIdFieldName(), targetKey.getId());
+          }
+        } catch (IllegalAccessException e) {
+          logging.warning("Received `IllegalAccessException` when trying to carry over key ID or name: " + e.getLocalizedMessage());
+        } catch (InvocationTargetException e) {
+          logging.warning("Received `InvocationTargetException` when trying to carry over key ID or name: " + e.getLocalizedMessage());
+        }
+      }
+      return modelObj;
+    } catch (JsonProcessingException e) {
+      logging.severe("Encountered JsonProcessingException when deserializing model of class '" + kind + "': " + e.getLocalizedMessage());
+      throw new RuntimeException(e);
+    } catch (ClassCastException e) {
+      logging.severe("Encountered ClassCastException when deserializing model of class '" + kind + "': " + e.getLocalizedMessage());
+      throw new RuntimeException(e);
+    }
   }
 
   public static <M extends AppModel> M deserialize(SerializedModel serialized) {

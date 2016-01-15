@@ -20,6 +20,9 @@
             </element>
             <element id="library" level="project" name="Maven: commons-cli:commons-cli:1.3.1" />
             <element id="library" level="project" name="Maven: commons-codec:commons-codec:1.10" />
+            <element id="library" level="project" name="Maven: commons-beanutils:commons-beanutils:1.9.2" />
+            <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.1.1" />
+            <element id="library" level="project" name="Maven: commons-collections:commons-collections:3.2.1" />
             <element id="library" level="project" name="Maven: commons-io:commons-io:2.4" />
             <element id="library" level="project" name="Maven: com.google.cloud.dataflow:google-cloud-dataflow-java-sdk-all:1.3.0" />
             <element id="library" level="project" name="Maven: com.google.apis:google-api-services-dataflow:v1b3-rev12-1.21.0" />
@@ -31,7 +34,6 @@
             <element id="library" level="project" name="Maven: com.google.http-client:google-http-client:1.21.0" />
             <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpclient:4.0.1" />
             <element id="library" level="project" name="Maven: org.apache.httpcomponents:httpcore:4.0.1" />
-            <element id="library" level="project" name="Maven: commons-logging:commons-logging:1.1.1" />
             <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-java6:1.21.0" />
             <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client:1.21.0" />
             <element id="library" level="project" name="Maven: com.google.code.findbugs:jsr305:1.3.9" />
@@ -243,7 +245,7 @@
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" value="io.momentum.demo.models.pipeline.PlatformPipeline" />
       <option name="VM_PARAMETERS" value="" />
-      <option name="PROGRAM_PARAMETERS" value="io.momentum.demo.models.MessagePipeline --appName=&quot;message-pipeline&quot; --tempDatasetId=&quot;bigquery.googleapis.com/messages&quot; --enableCloudDebugger=true --jobName=&quot;message-pipeline-v1&quot; --project=&quot;mm-api-demo&quot; --stagingLocation=&quot;gs://mm-api-demo/dataflow/staging/v1&quot; --tempLocation=&quot;gs://mm-api-demo/dataflow/temp/v1&quot; --local=false --dryRun=false --streaming=true --pubsubInputTopic=&quot;apidemo.messages.input&quot; --pubsubOutputTopic=&quot;apidemo.messages.output&quot; --bigQueryDataset=&quot;messages&quot; --bigQueryOutputTable=&quot;user_messages_v1&quot; --autoscalingAlgorithm=NONE --numWorkers=1 --maxNumWorkers=1 --network=default --zone=us-central1-f" />
+      <option name="PROGRAM_PARAMETERS" value="io.momentum.demo.models.MessagePipeline --appName=&quot;message-pipeline&quot; --tempDatasetId=&quot;bigquery.googleapis.com/messages&quot; --enableCloudDebugger=true --jobName=&quot;message-pipeline-v1&quot; --project=&quot;mm-api-demo&quot; --stagingLocation=&quot;gs://mm-api-demo/dataflow/staging/v1&quot; --tempLocation=&quot;gs://mm-api-demo/dataflow/temp/v1&quot; --local=false --dryRun=false --streaming=true --pubsubInputTopic=&quot;apidemo.messages.input&quot; --pubsubOutputTopic=&quot;apidemo.messages.output&quot; --bigQueryDataset=&quot;messages&quot; --bigQueryOutputTable=&quot;user_messages_v1&quot; --autoscalingAlgorithm=NONE --numWorkers=1 --maxNumWorkers=1 --network=default --zone=us-central1-f --enableWindowing=true" />
       <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -874,6 +876,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/twitter/hpack/0.10.1/hpack-0.10.1-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: commons-beanutils:commons-beanutils:1.9.2">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-beanutils/commons-beanutils/1.9.2/commons-beanutils-1.9.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-beanutils/commons-beanutils/1.9.2/commons-beanutils-1.9.2-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-beanutils/commons-beanutils/1.9.2/commons-beanutils-1.9.2-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: commons-cli:commons-cli:1.3.1">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-cli/commons-cli/1.3.1/commons-cli-1.3.1.jar!/" />
@@ -894,6 +907,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/commons-codec/commons-codec/1.10/commons-codec-1.10-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: commons-collections:commons-collections:3.2.1">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: commons-io:commons-io:2.4">
