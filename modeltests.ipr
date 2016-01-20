@@ -153,6 +153,7 @@
             <element id="library" level="project" name="Maven: com.google.appengine:appengine-endpoints:1.9.30" />
             <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
             <element id="library" level="project" name="Maven: com.google.appengine:appengine-testing:1.9.30" />
+            <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-stubs:1.9.30" />
           </element>
         </element>
         <element id="directory" name="META-INF">

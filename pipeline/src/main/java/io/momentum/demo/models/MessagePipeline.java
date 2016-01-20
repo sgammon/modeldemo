@@ -54,8 +54,8 @@ public final class MessagePipeline extends PlatformPipeline {
   @Override
   protected Pipeline collapse(Pipeline pipeline) {
     // add model coder stuff
-    pipeline.getCoderRegistry().registerCoder(AppModel.class, ModelCoder.class);
-    pipeline.getCoderRegistry().registerCoder(UserMessage.class, ModelCoder.class);
+    //pipeline.getCoderRegistry().registerCoder(AppModel.class, ModelCoder.class);
+    //pipeline.getCoderRegistry().registerCoder(UserMessage.class, ModelCoder.class);
 
     // read and inflate user messages
     PCollection<UserMessage> messages;
@@ -117,7 +117,7 @@ public final class MessagePipeline extends PlatformPipeline {
 
     @Override
     public void processElement(ProcessContext c) throws Exception {
-      UserMessage payload = c.element();
+      final UserMessage payload = c.element();
 
       globalMessageCounter.addValue(1);
       logging.info("Processing message from user '" + payload.name + "': \"" + payload.message + "\".");
@@ -127,7 +127,7 @@ public final class MessagePipeline extends PlatformPipeline {
         for (String word : payload.message.split("[^a-zA-Z']+")) {
           if (!word.isEmpty()) {
             globalWordCounter.addValue(1);
-            c.output(word);
+            c.output(word.toLowerCase());
           }
         }
       }

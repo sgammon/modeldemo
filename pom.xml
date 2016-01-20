@@ -425,7 +425,6 @@
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-api-stubs</artifactId>
             <version>${appengine.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.appengine</groupId>

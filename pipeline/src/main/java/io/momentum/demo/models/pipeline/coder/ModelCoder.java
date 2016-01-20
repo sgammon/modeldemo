@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.cloud.dataflow.sdk.coders.*;
 import com.google.cloud.dataflow.sdk.util.CloudObject;
 
+import io.momentum.demo.models.logic.runtime.datastore.DatastoreService;
 import io.momentum.demo.models.schema.AppModel;
 
 import java.io.*;
@@ -23,8 +24,8 @@ public final class ModelCoder<M extends AppModel> extends AtomicCoder<M> {
   @JsonCreator
   @SuppressWarnings("unchecked")
   public static ModelCoder<?> of(@JsonProperty("kind") String classType) throws ClassNotFoundException {
-    Class<?> clazz = Class.forName(classType);
-    return of((Class<? extends AppModel>) clazz);
+    Class<? extends AppModel> kindClass = DatastoreService.resolve(classType);
+    return of(kindClass);
   }
 
   private String kind;
@@ -49,9 +50,18 @@ public final class ModelCoder<M extends AppModel> extends AtomicCoder<M> {
   }
 
   @Override
+  public boolean equals(Object other) {
+    return (other instanceof ModelCoder && getKind().equals(((ModelCoder) other).getKind()));
+  }
+
+  @Override
   public CloudObject asCloudObject() {
     CloudObject co = super.asCloudObject();
     co.set("kind", kind);
     return co;
+  }
+
+  public String getKind() {
+    return kind;
   }
 }

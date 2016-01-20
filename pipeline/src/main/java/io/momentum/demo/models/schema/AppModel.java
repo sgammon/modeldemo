@@ -31,6 +31,8 @@ import io.momentum.demo.models.pipeline.PlatformCodec;
 import io.momentum.demo.models.pipeline.coder.ModelCoder;
 import io.momentum.demo.models.pipeline.coder.TypedSerializedModel;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
@@ -47,6 +49,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(value = Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public abstract class AppModel implements Serializable {
+  private transient boolean _entityUpdateMode = false;
   private static final PlatformCodec codec = new PlatformCodec();
   private static final Logger logging = Logger.getLogger(AppModel.class.getSimpleName());
 
@@ -89,6 +92,9 @@ public abstract class AppModel implements Serializable {
   protected static Objectify datastore() {
     return DatastoreService.ofy();
   }
+  protected static Closeable objectify() {
+    return ObjectifyService.begin();
+  }
 
   /** -- properties -- **/
   // timestamp for creation
@@ -100,10 +106,16 @@ public abstract class AppModel implements Serializable {
   public @Index @JsonProperty("modified") Date modified;
 
   /** -- lifecycle -- **/
+  private void setEntityExportMode(boolean mode) {
+    _entityUpdateMode = mode;
+  }
+
   public @OnSave void updateTimestamps() {
-    Date ts = new Date();
-    this.modified = ts;
-    if (this.created == null) this.created = ts;
+    if (!_entityUpdateMode) {
+      Date ts = new Date();
+      this.modified = ts;
+      if (this.created == null) this.created = ts;
+    }
   }
 
   /** -- getters/setters -- **/
@@ -121,17 +133,29 @@ public abstract class AppModel implements Serializable {
   }
 
   public Map<String, Object> flatten(boolean removeNulls) {
-    Map<String, Object> obj = datastore().save().toEntity(this).getProperties();
-    if (removeNulls) {
-      Map<String, Object> finalObjs = new HashMap<>();
-      for (Map.Entry<String, Object> entry : obj.entrySet()) {
-        if (entry.getValue() != null) {
-          finalObjs.put(entry.getKey(), entry.getValue());
+    try (Closeable dsSession = objectify()) {
+
+      // don't update timestamps when exporting to entity
+      setEntityExportMode(true);
+      Map<String, Object> obj = datastore().save()
+                                           .toEntity(this)
+                                           .getProperties();
+      setEntityExportMode(false);
+
+      if (removeNulls) {
+        Map<String, Object> finalObjs = new HashMap<>();
+        for (Map.Entry<String, Object> entry : obj.entrySet()) {
+          if (entry.getValue() != null) {
+            finalObjs.put(entry.getKey(), entry.getValue());
+          }
         }
+        return finalObjs;
       }
-      return finalObjs;
+      return obj;
+    } catch (IOException e) {
+      logging.severe("Encountered IOException during model flatten: " + e.getLocalizedMessage());
+      throw new RuntimeException(e);
     }
-    return obj;
   }
 
   public SerializedModel serialize() {
@@ -145,8 +169,7 @@ public abstract class AppModel implements Serializable {
   @SuppressWarnings("unchecked")
   public static <M extends AppModel> M deserialize(String kind, JsonNode node, TypeReference<M> ref, TypedSerializedModel<M> serialized) {
     // inflate key, attach, and deserialize
-    try {
-      datastore();
+    try (Closeable dsSession = objectify()) {
       Class<M> modelClass = (Class<M>)DatastoreService.resolve(kind);
       if (modelClass == null) throw new RuntimeException("unable to resolve model class: '" + kind + "'");
 
@@ -184,6 +207,9 @@ public abstract class AppModel implements Serializable {
       throw new RuntimeException(e);
     } catch (ClassCastException e) {
       logging.severe("Encountered ClassCastException when deserializing model of class '" + kind + "': " + e.getLocalizedMessage());
+      throw new RuntimeException(e);
+    } catch (IOException e) {
+      logging.severe("Encountered IOException when deserializing model of class '" + kind + "': " + e.getLocalizedMessage());
       throw new RuntimeException(e);
     }
   }
