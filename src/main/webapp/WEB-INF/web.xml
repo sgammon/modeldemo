@@ -4,9 +4,44 @@
         <servlet-class>com.google.api.server.spi.SystemServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>io.momentum.demo.models.logic.service.unified.v1.UnifiedService</param-value>
+            <param-value>io.momentum.demo.models.service.unified.v1.UnifiedService</param-value>
         </init-param>
     </servlet>
+
+    <servlet>
+        <servlet-name>WarmupServlet</servlet-name>
+        <servlet-class>io.momentum.demo.models.logic.servlets.WarmupServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>AppstatsServlet</servlet-name>
+        <servlet-class>com.google.appengine.tools.appstats.AppstatsServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>LandingServlet</servlet-name>
+        <servlet-class>io.momentum.demo.models.servlets.LandingServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>LandingServlet</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AppstatsServlet</servlet-name>
+        <url-pattern>/appstats/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>WarmupServlet</servlet-name>
+        <url-pattern>/_ah/warmup</url-pattern>
+        <url-pattern>/_ah/warmup/*</url-pattern>
+        <url-pattern>/_ah/start</url-pattern>
+        <url-pattern>/_ah/start/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>SystemServiceServlet</servlet-name>
@@ -15,7 +50,16 @@
 
     <filter>
         <filter-name>K9Filter</filter-name>
-        <filter-class>io.momentum.demo.models.logic.filters.K9Filter</filter-class>
+        <filter-class>io.momentum.demo.models.filters.K9Filter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>AppstatsFilter</filter-name>
+        <filter-class>com.google.appengine.tools.appstats.AppstatsFilter</filter-class>
+        <init-param>
+            <param-name>logMessage</param-name>
+            <param-value>Appstats available: /appstats/details?time={ID}</param-value>
+        </init-param>
     </filter>
 
     <filter>
@@ -29,6 +73,11 @@
     </filter>
 
     <filter-mapping>
+        <filter-name>AppstatsFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
         <filter-name>ObjectifyFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
@@ -38,7 +87,63 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>dash</web-resource-name>
+            <url-pattern>/</url-pattern>
+            <url-pattern>/assets/*</url-pattern>
+        </web-resource-collection>
+
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>appstats</web-resource-name>
+            <url-pattern>/appstats/*</url-pattern>
+        </web-resource-collection>
+
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>api-endpoint</web-resource-name>
+            <url-pattern>/_ah/api</url-pattern>
+            <url-pattern>/_ah/api/rpc</url-pattern>
+            <url-pattern>/_ah/api/*</url-pattern>
+        </web-resource-collection>
+
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>api-explorer</web-resource-name>
+            <url-pattern>/_ah/api/explorer</url-pattern>
+            <url-pattern>/_ah/api/explorer/*</url-pattern>
+        </web-resource-collection>
+
+        <user-data-constraint>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
 </web-app>
