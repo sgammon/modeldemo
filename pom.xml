@@ -41,7 +41,6 @@
         <htmlcompressor.version>1.5.2</htmlcompressor.version>
         <twilio.version>6.2.0-edge</twilio.version>
         <msgpack.core.version>0.8.1</msgpack.core.version>
-        <msgpack.databind.version>0.8.1</msgpack.databind.version>
         <fb.rest.version>1.18.1</fb.rest.version>
         <sesame.version>4.0.1</sesame.version>
         <pebble.version>2.0.2-SNAPSHOT</pebble.version>
@@ -245,7 +244,7 @@
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>jackson-dataformat-msgpack</artifactId>
-            <version>${msgpack.databind.version}</version>
+            <version>${msgpack.core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.apis</groupId>
