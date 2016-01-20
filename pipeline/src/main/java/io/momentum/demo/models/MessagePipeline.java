@@ -89,12 +89,12 @@ public final class MessagePipeline extends PlatformPipeline {
         // output stats to file
         if (options.getStorageBucket() == null) throw new RuntimeException("you forgot your storage bucket ya doofus");
 
-        if (options.getStorageOutputFile() != null) {
+        if (options.getStorageOutputFile() != null && !options.getDryRun()) {
           // output via storage file
           wordStats.apply(TextIO.Write.to(options.getStorageOutputFile())
                                       .named("Write to Storage"));
 
-        } else if (options.getStorageOutputPrefix() != null) {
+        } else if (options.getStorageOutputPrefix() != null && !options.getDryRun()) {
           // output via storage prefix
           wordStats.apply(TextIO.Write.withShardNameTemplate(options.getStorageOutputPrefix())
                                       .withSuffix("csv")
@@ -147,9 +147,8 @@ public final class MessagePipeline extends PlatformPipeline {
     public void processElement(ProcessContext processContext) throws Exception {
       UserMessage payload = processContext.element();
       TableRow row = payload.export();
-      Key objectKey = Key.create(payload);
-      row.set("key", objectKey.toWebSafeString());
-      row.set("kind", objectKey.getKind());
+      row.set("id", payload.getId());
+      row.set("kind", UserMessage.class.getSimpleName());
       processContext.output(row);
     }
   }
@@ -211,8 +210,10 @@ public final class MessagePipeline extends PlatformPipeline {
 
   private static void publish(MessagesPipelineOptions options,
                               PCollection<UserMessage> pipeline) {
-    pipeline.apply(PubsubIO.Write.topic(topicForOutput(options.as(PubsubOutputOptions.class)))
-                                 .withCoder(ModelCoder.of(UserMessage.class))
-                                 .named("Re-publish Messages"));
+    if (options.getPubsubOutputTopic() != null) {
+      pipeline.apply(PubsubIO.Write.topic(topicForOutput(options.as(PubsubOutputOptions.class)))
+                                   .withCoder(ModelCoder.of(UserMessage.class))
+                                   .named("Re-publish Messages"));
+    }
   }
 }

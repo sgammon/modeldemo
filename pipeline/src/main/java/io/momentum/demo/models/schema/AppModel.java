@@ -54,7 +54,7 @@ public abstract class AppModel implements Serializable {
 
   private enum FieldType {
     STRING,
-    NUMBER,
+    INTEGER,
     FLOAT,
     BOOLEAN,
     TIMESTAMP,
@@ -84,6 +84,11 @@ public abstract class AppModel implements Serializable {
 
     private static FieldSchema notNullable(FieldType type) {
       return new FieldSchema(type, false, false);
+    }
+
+    @Override
+    public String toString() {
+      return type.name();
     }
   }
 
@@ -187,7 +192,8 @@ public abstract class AppModel implements Serializable {
   public static FieldSchema resolveTypeForTableRow(Schema schema) {
     switch (schema.getType()) {
       case STRING: return FieldSchema.notNullable(FieldType.STRING);
-      case INT: return FieldSchema.notNullable(FieldType.NUMBER);
+      case INT: return FieldSchema.notNullable(FieldType.INTEGER);
+      case LONG: return FieldSchema.notNullable(FieldType.INTEGER);
       case FLOAT: return FieldSchema.notNullable(FieldType.FLOAT);
       case BOOLEAN: return FieldSchema.notNullable(FieldType.BOOLEAN);
       case ARRAY:
@@ -226,19 +232,11 @@ public abstract class AppModel implements Serializable {
     List<TableFieldSchema> fields = new ArrayList<>();
 
     // add key and kind first
-    TableFieldSchema keySchema = new TableFieldSchema();
-    keySchema.setName("key");
-    keySchema.setType("STRING");
-    keySchema.setMode("REQUIRED");
-    keySchema.setDescription("Datastore key for original record.");
-
     TableFieldSchema kindSchema = new TableFieldSchema();
     kindSchema.setName("kind");
     kindSchema.setType("STRING");
     kindSchema.setMode("REQUIRED");
     kindSchema.setDescription("Datastore kind for original record.");
-
-    fields.add(keySchema);
     fields.add(kindSchema);
 
     // sniff schema using avro
@@ -255,6 +253,12 @@ public abstract class AppModel implements Serializable {
           field.name().equals("modified")) {
         fieldSchema.setType("TIMESTAMP");
         fieldSchema.setMode("REQUIRED");
+
+        if (field.name().equals("created")) {
+          fieldSchema.setDescription("Timestamp for when this record was created.");
+        } else {
+          fieldSchema.setDescription("Timestamp for when this record was last modified.");
+        }
       } else {
         FieldSchema resolved = resolveTypeForTableRow(field.schema());
         fieldSchema.setType(resolved.toString());

@@ -43,7 +43,7 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
       kind = target.getKind();
     } catch (RuntimeException e) {
       subject = null;
-      kind = Key.create(model.getClass(), "1").getKind();
+      kind = model.getClass().getSimpleName();
     }
     this.kind = kind;
     this.key = subject;

@@ -3,6 +3,7 @@ package io.momentum.demo.models.schema;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
 import com.googlecode.objectify.annotation.*;
@@ -21,7 +22,9 @@ import io.momentum.demo.models.pipeline.coder.ModelCoder;
 public final class UserMessage extends AppModel {
   /** -- properties -- **/
   @Tag(value = 10, alias = "i")
-  public @Id @JsonProperty("id") Long id;
+  @JsonProperty("id")
+  @JsonPropertyDescription("Google-assigned ID for the user account.")
+  public @Id Long id;
 
   // user's full name
   @Tag(value = 20, alias = "n")
