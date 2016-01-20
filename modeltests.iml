@@ -101,9 +101,9 @@
     <orderEntry type="library" name="Maven: com.google.apis:google-api-services-discovery:v1-rev53-1.21.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.api-client:google-api-client-protobuf:1.21.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-protobuf:1.21.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.7.0" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.4.5" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.4.5" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.4.5" level="project" />
     <orderEntry type="library" name="Maven: org.msgpack:msgpack-core:0.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.8.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.apis:google-api-services-oauth2:v2-rev98-1.21.0" level="project" />

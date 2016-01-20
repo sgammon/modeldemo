@@ -35,7 +35,7 @@
         <snakeyaml.version>1.16</snakeyaml.version>
         <jcabi-http.version>1.14.1</jcabi-http.version>
         <findbugs.version>3.0.1</findbugs.version>
-        <jackson.version>2.7.0</jackson.version>
+        <jackson.version>2.4.5</jackson.version>
         <closure.version>v20151216</closure.version>
         <yui.version>2.4.8</yui.version>
         <htmlcompressor.version>1.5.2</htmlcompressor.version>
