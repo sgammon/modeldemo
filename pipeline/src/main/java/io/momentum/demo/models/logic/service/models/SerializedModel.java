@@ -7,7 +7,6 @@ import com.googlecode.objectify.Key;
 import io.momentum.demo.models.schema.AppModel;
 
 import java.io.Serializable;
-import java.util.Map;
 
 
 /**
@@ -17,13 +16,13 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
   /** -- properties -- **/
   public final @JsonProperty("kind") String kind;
   public final @JsonProperty("key") SerializedKey key;
-  public final @JsonProperty("data") Map<String, Object> data;
+  public final @JsonProperty("data") AppModel data;
 
   /** -- constructors -- **/
   @JsonCreator
   public SerializedModel(@JsonProperty("kind") String kind,
                          @JsonProperty("key") SerializedKey key,
-                         @JsonProperty("data") Map<String, Object> data) {
+                         @JsonProperty("data") AppModel data) {
     this.kind = kind;
     this.key = key;
     this.data = data;
@@ -34,7 +33,7 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
   }
 
   public SerializedModel(AppModel model, boolean removeNulls) {
-    this.data = model.flatten(removeNulls);
+    this.data = model;
 
     SerializedKey subject;
     String kind;
@@ -55,7 +54,7 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
     return key;
   }
 
-  public Map<String, Object> getData() {
+  public AppModel getData() {
     return data;
   }
 }

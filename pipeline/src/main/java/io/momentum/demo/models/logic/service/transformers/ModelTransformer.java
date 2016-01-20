@@ -20,6 +20,6 @@ public final class ModelTransformer implements Transformer<AppModel, SerializedM
   @Override
   public AppModel transformFrom(SerializedModel model) {
     if (model == null) return null;
-    return AppModel.deserialize(model);
+    return model.getData();
   }
 }

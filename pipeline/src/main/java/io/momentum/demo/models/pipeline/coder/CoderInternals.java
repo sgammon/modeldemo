@@ -23,15 +23,6 @@ import java.nio.charset.StandardCharsets;
 final class CoderInternals {
   private static final CoderMode coder = CoderMode.JSON;
   private static final PlatformCodec codec = new PlatformCodec();
-  private static final LocalServiceTestHelper helper = new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-
-  private static Closeable datastore() {
-    // warm datastore for decoding/encoding models
-    Closeable context = ObjectifyService.begin();
-    DatastoreService.ofy();
-    helper.setUp();
-    return context;
-  }
 
   /** -- implementations -- **/
   private enum CoderMode implements ModelSerializer {
@@ -120,19 +111,13 @@ final class CoderInternals {
                                                  OutputStream outStream,
                                                  Coder.Context context,
                                                  TypeReference<TypedSerializedModel<M>> reference) throws IOException {
-    try (Closeable ofy = datastore()) {
-      coder.encode(value.serialize(), outStream, context, reference);
-      helper.tearDown();
-    }
+    coder.encode(value.serialize(), outStream, context, reference);
   }
 
   public static <M extends AppModel> M decode(InputStream inStream,
                                               Coder.Context context,
                                               TypeReference<TypedSerializedModel<M>> reference) throws IOException {
-    try (Closeable ofy = datastore()) {
-      TypedSerializedModel<M> s = coder.decode(inStream, context, reference);
-      helper.tearDown();
-      return s.getData();
-    }
+    TypedSerializedModel<M> s = coder.decode(inStream, context, reference);
+    return s.getData();
   }
 }

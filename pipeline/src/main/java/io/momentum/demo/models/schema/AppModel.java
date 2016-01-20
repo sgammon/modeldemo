@@ -49,7 +49,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(value = Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public abstract class AppModel implements Serializable {
-  private transient boolean _entityUpdateMode = false;
   private static final PlatformCodec codec = new PlatformCodec();
   private static final Logger logging = Logger.getLogger(AppModel.class.getSimpleName());
 
@@ -105,17 +104,10 @@ public abstract class AppModel implements Serializable {
   @Tag(value = 2, alias = "m")
   public @Index @JsonProperty("modified") Date modified;
 
-  /** -- lifecycle -- **/
-  private void setEntityExportMode(boolean mode) {
-    _entityUpdateMode = mode;
-  }
-
   public @OnSave void updateTimestamps() {
-    if (!_entityUpdateMode) {
-      Date ts = new Date();
-      this.modified = ts;
-      if (this.created == null) this.created = ts;
-    }
+    Date ts = new Date();
+    this.modified = ts;
+    if (this.created == null) this.created = ts;
   }
 
   /** -- getters/setters -- **/
@@ -130,32 +122,6 @@ public abstract class AppModel implements Serializable {
   /** -- schema & codec -- **/
   public String kind() {
     return Key.create(this.getClass(), "1").getKind();
-  }
-
-  public Map<String, Object> flatten(boolean removeNulls) {
-    try (Closeable dsSession = objectify()) {
-
-      // don't update timestamps when exporting to entity
-      setEntityExportMode(true);
-      Map<String, Object> obj = datastore().save()
-                                           .toEntity(this)
-                                           .getProperties();
-      setEntityExportMode(false);
-
-      if (removeNulls) {
-        Map<String, Object> finalObjs = new HashMap<>();
-        for (Map.Entry<String, Object> entry : obj.entrySet()) {
-          if (entry.getValue() != null) {
-            finalObjs.put(entry.getKey(), entry.getValue());
-          }
-        }
-        return finalObjs;
-      }
-      return obj;
-    } catch (IOException e) {
-      logging.severe("Encountered IOException during model flatten: " + e.getLocalizedMessage());
-      throw new RuntimeException(e);
-    }
   }
 
   public SerializedModel serialize() {
@@ -211,24 +177,6 @@ public abstract class AppModel implements Serializable {
     } catch (IOException e) {
       logging.severe("Encountered IOException when deserializing model of class '" + kind + "': " + e.getLocalizedMessage());
       throw new RuntimeException(e);
-    }
-  }
-
-  public static <M extends AppModel> M deserialize(SerializedModel serialized) {
-    Key targetKey = Key.create(serialized.key.encoded);
-    com.google.appengine.api.datastore.Entity lowlevelEntity = new com.google.appengine.api.datastore.Entity(targetKey.getRaw());
-
-    if (serialized.data.size() > 0) {
-      for (Map.Entry<String, Object> entry : serialized.data.entrySet()) {
-        lowlevelEntity.setProperty(entry.getKey(), entry.getValue());
-      }
-    }
-
-    try {
-      return datastore().load().fromEntity(lowlevelEntity);
-    } catch (ClassCastException e) {
-      logging.severe("Unable to cast model during deserialization: " + e.getLocalizedMessage());
-      throw new RuntimeException("Unable to cast model during deserialization: " + e.getLocalizedMessage());
     }
   }
 
