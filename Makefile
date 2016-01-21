@@ -14,8 +14,8 @@ dependencies:
 
 build:
 	@echo "Building modeltests..."
-	@pushd pipeline/ && \
-	       $(MAKE) all BUILDBOT=$(BUILDBOT) && popd && \
+	@cd pipeline/ && \
+	       $(MAKE) all BUILDBOT=$(BUILDBOT) && cd .. && \
 	       mvn clean package install;
 	@echo "Build complete."
 
