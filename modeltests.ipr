@@ -83,7 +83,7 @@
             <element id="library" level="project" name="Maven: com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-4" />
             <element id="library" level="project" name="Maven: com.google.appengine:appengine-tools-sdk:1.9.30" />
             <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.0.0-beta-2" />
-            <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-labs:1.9.30" />
+            <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-labs:1.9.31" />
             <element id="library" level="project" name="Maven: com.google.apis:google-api-services-discovery:v1-rev53-1.21.0" />
             <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-protobuf:1.21.0" />
             <element id="library" level="project" name="Maven: com.google.http-client:google-http-client-protobuf:1.21.0" />
@@ -94,9 +94,9 @@
             <element id="library" level="project" name="Maven: com.fasterxml.jackson.module:jackson-module-jsonSchema:2.7.0" />
             <element id="library" level="project" name="Maven: javax.validation:validation-api:1.1.0.Final" />
             <element id="library" level="project" name="Maven: org.msgpack:jackson-dataformat-msgpack:0.8.1" />
-            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-oauth2:v2-rev98-1.21.0" />
-            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-plus:v1-rev318-1.21.0" />
-            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-pubsub:v1-rev7-1.21.0" />
+            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-oauth2:v2-rev100-1.21.0" />
+            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-plus:v1-rev325-1.21.0" />
+            <element id="library" level="project" name="Maven: com.google.apis:google-api-services-pubsub:v1-rev8-1.21.0" />
             <element id="library" level="project" name="Maven: com.google.api-client:google-api-client-appengine:1.21.0" />
             <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-appengine:1.21.0" />
             <element id="library" level="project" name="Maven: com.google.oauth-client:google-oauth-client-servlet:1.21.0" />
@@ -155,7 +155,6 @@
             <element id="library" level="project" name="Maven: com.google.appengine:appengine-endpoints:1.9.30" />
             <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
             <element id="library" level="project" name="Maven: com.google.appengine:appengine-testing:1.9.30" />
-            <element id="library" level="project" name="Maven: com.google.appengine:appengine-api-stubs:1.9.30" />
           </element>
         </element>
         <element id="directory" name="META-INF">
@@ -527,6 +526,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-discovery/v1-rev53-1.21.0/google-api-services-discovery-v1-rev53-1.21.0-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: com.google.apis:google-api-services-oauth2:v2-rev100-1.21.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-oauth2/v2-rev100-1.21.0/google-api-services-oauth2-v2-rev100-1.21.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-oauth2/v2-rev100-1.21.0/google-api-services-oauth2-v2-rev100-1.21.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-oauth2/v2-rev100-1.21.0/google-api-services-oauth2-v2-rev100-1.21.0-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: com.google.apis:google-api-services-oauth2:v2-rev98-1.21.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-oauth2/v2-rev98-1.21.0/google-api-services-oauth2-v2-rev98-1.21.0.jar!/" />
@@ -549,6 +559,17 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-plus/v1-rev318-1.21.0/google-api-services-plus-v1-rev318-1.21.0-sources.jar!/" />
       </SOURCES>
     </library>
+    <library name="Maven: com.google.apis:google-api-services-plus:v1-rev325-1.21.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-plus/v1-rev325-1.21.0/google-api-services-plus-v1-rev325-1.21.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-plus/v1-rev325-1.21.0/google-api-services-plus-v1-rev325-1.21.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-plus/v1-rev325-1.21.0/google-api-services-plus-v1-rev325-1.21.0-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="Maven: com.google.apis:google-api-services-pubsub:v1-rev7-1.21.0">
       <CLASSES>
         <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-pubsub/v1-rev7-1.21.0/google-api-services-pubsub-v1-rev7-1.21.0.jar!/" />
@@ -558,6 +579,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-pubsub/v1-rev7-1.21.0/google-api-services-pubsub-v1-rev7-1.21.0-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.google.apis:google-api-services-pubsub:v1-rev8-1.21.0">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-pubsub/v1-rev8-1.21.0/google-api-services-pubsub-v1-rev8-1.21.0.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-pubsub/v1-rev8-1.21.0/google-api-services-pubsub-v1-rev8-1.21.0-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/apis/google-api-services-pubsub/v1-rev8-1.21.0/google-api-services-pubsub-v1-rev8-1.21.0-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.google.apis:google-api-services-storage:v1-rev53-1.21.0">
@@ -582,15 +614,15 @@
         <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-1.0-sdk/1.9.30/appengine-api-1.0-sdk-1.9.30-sources.jar!/" />
       </SOURCES>
     </library>
-    <library name="Maven: com.google.appengine:appengine-api-labs:1.9.30">
+    <library name="Maven: com.google.appengine:appengine-api-labs:1.9.31">
       <CLASSES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.30/appengine-api-labs-1.9.30.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.31/appengine-api-labs-1.9.31.jar!/" />
       </CLASSES>
       <JAVADOC>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.30/appengine-api-labs-1.9.30-javadoc.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.31/appengine-api-labs-1.9.31-javadoc.jar!/" />
       </JAVADOC>
       <SOURCES>
-        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.30/appengine-api-labs-1.9.30-sources.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-api-labs/1.9.31/appengine-api-labs-1.9.31-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.google.appengine:appengine-api-stubs:1.9.30">
@@ -624,6 +656,17 @@
       </JAVADOC>
       <SOURCES>
         <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-testing/1.9.30/appengine-testing-1.9.30-sources.jar!/" />
+      </SOURCES>
+    </library>
+    <library name="Maven: com.google.appengine:appengine-testing:1.9.31">
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-testing/1.9.31/appengine-testing-1.9.31.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-testing/1.9.31/appengine-testing-1.9.31-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/google/appengine/appengine-testing/1.9.31/appengine-testing-1.9.31-sources.jar!/" />
       </SOURCES>
     </library>
     <library name="Maven: com.google.appengine:appengine-tools-sdk:1.9.30">

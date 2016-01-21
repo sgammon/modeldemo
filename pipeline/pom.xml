@@ -16,7 +16,7 @@
         <platform.java.target>1.7</platform.java.target>
 
         <!-- App Engine -->
-        <appengine.target.version>1.9.30</appengine.target.version>
+        <appengine.target.version>1.9.31</appengine.target.version>
         <appengine.maven.version>1.9.28</appengine.maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -390,6 +390,12 @@
         <dependency>
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-testing</artifactId>
+            <version>${appengine.target.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.appengine</groupId>
+            <artifactId>appengine-tools-sdk</artifactId>
             <version>1.9.30</version>
         </dependency>
     </dependencies>

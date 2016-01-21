@@ -11,10 +11,12 @@ import com.google.cloud.dataflow.sdk.transforms.*;
 import com.google.cloud.dataflow.sdk.values.KV;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 
 import io.momentum.demo.models.pipeline.PlatformPipeline;
 import io.momentum.demo.models.pipeline.coder.ModelCoder;
 import io.momentum.demo.models.pipeline.options.*;
+import io.momentum.demo.models.schema.Account;
 import io.momentum.demo.models.schema.AppModel;
 import io.momentum.demo.models.schema.UserMessage;
 
@@ -159,8 +161,10 @@ public final class MessagePipeline extends PlatformPipeline {
       TableRow row = c.element();
       String name = (String)row.get("name");
       String message = (String)row.get("message");
-      String email = (String)row.get("email");
-      UserMessage messageObject = new UserMessage(name, message, email);
+      String encodedAccountKey = (String)row.get("account");
+
+      Key<Account> accountKey = Key.create(encodedAccountKey);
+      UserMessage messageObject = new UserMessage(name, message, Ref.create(accountKey));
 
       // carry over key ID
       String encodedKey = (String)row.get("key");

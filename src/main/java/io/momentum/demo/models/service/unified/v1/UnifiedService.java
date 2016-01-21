@@ -7,6 +7,7 @@ import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.cmd.Query;
 
+import io.momentum.demo.models.logic.oauth.google.GoogleScopes;
 import io.momentum.demo.models.logic.service.base.PlatformService;
 import io.momentum.demo.models.logic.service.exceptions.BadRequest;
 import io.momentum.demo.models.logic.service.exceptions.Forbidden;
@@ -34,6 +35,7 @@ import java.io.IOException;
      defaultVersion = AnnotationBoolean.TRUE,
      useDatastoreForAdditionalConfig = AnnotationBoolean.FALSE,
      authLevel = AuthLevel.OPTIONAL,
+     scopes = {GoogleScopes.ME, GoogleScopes.EMAIL},
      clientIds = {"292824132082.apps.googleusercontent.com"},
      namespace = @ApiNamespace(ownerName = "momentum ideas",
                                ownerDomain = "momentum.io",
@@ -102,6 +104,7 @@ public final class UnifiedService extends PlatformService {
       Account newAccount = new Account(user, "John", "Doe");
       datastore().save()
                  .entity(newAccount);
+      return newAccount;
     }
     return existing;
   }
@@ -162,7 +165,7 @@ public final class UnifiedService extends PlatformService {
     } else {
       messageObject = new UserMessage(name, message);
     }
-    datastore().save().entity(messageObject);
+    datastore().save().entity(messageObject).now();
     return publish(messageObject);
   }
 

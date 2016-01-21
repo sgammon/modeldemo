@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
+import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.*;
 import io.protostuff.Tag;
@@ -105,6 +106,12 @@ public final class UserMessage extends AppModel {
     row.set("message", message);
     row.set("modified", modified.getTime());
     row.set("created", created.getTime());
+
+    if (account != null)
+      row.set("account", Key.create(this).toWebSafeString());
+    else
+      row.set("account", null);
+
     return row;
   }
 }
