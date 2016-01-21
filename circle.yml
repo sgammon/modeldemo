@@ -1,0 +1,26 @@
+
+#
+#  CircleCI
+#
+
+machine:
+
+  timezone: America/Los_Angeles
+
+  java:
+    version: oraclejdk7
+
+  python:
+    version: 2.7.8
+
+  node:
+    version: 0.11.13
+
+dependencies:
+  override:
+    - make dependencies BUILDBOT=1
+
+test:
+  override:
+    - make all BUILDBOT=1
+
