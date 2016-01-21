@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
+import com.googlecode.objectify.Ref;
 import com.googlecode.objectify.annotation.*;
 import io.protostuff.Tag;
 import org.apache.avro.reflect.Nullable;
@@ -22,9 +23,7 @@ import io.momentum.demo.models.pipeline.coder.ModelCoder;
 public final class UserMessage extends AppModel {
   /** -- properties -- **/
   @Tag(value = 10, alias = "i")
-  @JsonProperty("id")
-  @JsonPropertyDescription("Google-assigned ID for the user account.")
-  public @Id Long id;
+  public @Id @JsonProperty("id") Long id;
 
   // user's full name
   @Tag(value = 20, alias = "n")
@@ -35,8 +34,8 @@ public final class UserMessage extends AppModel {
   public @Index @JsonProperty("message") String message;
 
   // email address, if logged in
-  @Tag(value = 40, alias = "e")
-  public @Index @Nullable @JsonProperty("email") String email;
+  @Tag(value = 40, alias = "a")
+  public @Index @Nullable @JsonProperty("account") Ref<Account> account;
 
   /** -- constructors -- **/
   public UserMessage() {}
@@ -45,16 +44,24 @@ public final class UserMessage extends AppModel {
                      String message) {
     this.name = name;
     this.message = message;
-    this.email = null;
+    this.account = null;
+  }
+
+  public UserMessage(String name,
+                     String message,
+                     Account account) {
+    this.name = name;
+    this.message = message;
+    this.account = Ref.create(account);
   }
 
   @JsonCreator
   public UserMessage(@JsonProperty("name") String name,
                      @JsonProperty("message") String message,
-                     @JsonProperty("email") String email) {
+                     @JsonProperty("account") Ref<Account> account) {
     this.name = name;
     this.message = message;
-    this.email = email;
+    this.account = account;
   }
 
   /** -- getters & setters -- **/
@@ -80,6 +87,14 @@ public final class UserMessage extends AppModel {
 
   public void setMessage(String message) {
     this.message = message;
+  }
+
+  public Ref<Account> getAccount() {
+    return account;
+  }
+
+  public void setAccount(Ref<Account> account) {
+    this.account = account;
   }
 
   /** -- table rows -- **/

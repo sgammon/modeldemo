@@ -4,8 +4,11 @@ import com.google.api.server.spi.ServiceException;
 import com.google.api.server.spi.auth.common.User;
 import com.google.api.server.spi.config.*;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.cmd.Query;
 
 import io.momentum.demo.models.logic.service.base.PlatformService;
+import io.momentum.demo.models.logic.service.exceptions.BadRequest;
 import io.momentum.demo.models.logic.service.exceptions.Forbidden;
 import io.momentum.demo.models.logic.service.exceptions.NotFound;
 import io.momentum.demo.models.logic.service.exceptions.ServiceError;
@@ -14,6 +17,7 @@ import io.momentum.demo.models.logic.service.models.QueryOptions;
 import io.momentum.demo.models.logic.service.models.QueryResponse;
 import io.momentum.demo.models.logic.service.models.SerializedKey;
 import io.momentum.demo.models.logic.service.transformers.KeyInflator;
+import io.momentum.demo.models.schema.Account;
 import io.momentum.demo.models.schema.UserMessage;
 
 import java.io.IOException;
@@ -53,6 +57,20 @@ public final class UnifiedService extends PlatformService {
       public Class<? extends ServiceException> exception() {
         return Forbidden.class;
       }
+    },
+
+    INVALID_EMAIL {
+      @Override
+      public Class<? extends ServiceException> exception() {
+        return BadRequest.class;
+      }
+    },
+
+    EMAIL_NOT_FOUND {
+      @Override
+      public Class<? extends ServiceException> exception() {
+        return NotFound.class;
+      }
     }
   }
 
@@ -72,18 +90,61 @@ public final class UnifiedService extends PlatformService {
     return SerializedKey.fromKey(Key.create(message));
   }
 
+  private Account accountFromUser(User user) {
+    // build us a new user
+    String id = user.getId();
+    Account existing = datastore().load()
+                                  .type(Account.class)
+                                  .id(id)
+                                  .now();
+
+    if (existing == null) {
+      Account newAccount = new Account(user, "John", "Doe");
+      datastore().save()
+                 .entity(newAccount);
+    }
+    return existing;
+  }
+
+  private Account accountFromEmail(String email) {
+    Query<Account> accountQuery = datastore().load()
+                                             .type(Account.class)
+                                             .filter("email =", email);
+    return accountQuery.first().now();
+  }
+
   /** -- API methods -- **/
   @ApiMethod(name = "list",
              path = "messages",
              httpMethod = ApiMethod.HttpMethod.GET)
-  public QueryResponse list(@Named("options") @Nullable QueryOptions options,
-                            User user) {
-    // list all messages, in the order they were posted
-    return this.prepare(datastore()
-                            .load()
-                            .type(UserMessage.class)
-                            .hybrid(true)
-                            .order("-created"), options);
+  public QueryResponse list(@Named("email") @Nullable String userEmail,
+                            @Named("options") @Nullable QueryOptions options,
+                            User user) throws ServiceException {
+    if (userEmail != null) {
+      // validate email address
+      if (userEmail.trim().isEmpty() || !userEmail.contains("@") || !userEmail.contains("."))
+        throw this.fail(UnifiedServiceError.INVALID_EMAIL);
+
+      // fetch account email references
+      Account subject = accountFromEmail(userEmail);
+      if (subject == null)
+        throw this.fail(UnifiedServiceError.EMAIL_NOT_FOUND);
+
+      // return query, filtered by account
+      return this.prepare(datastore()
+                              .load()
+                              .type(UserMessage.class)
+                              .hybrid(true)
+                              .filter("account =", Ref.create(subject))
+                              .order("-created"), options);
+    } else {
+      // list all messages, in the order they were posted
+      return this.prepare(datastore()
+                              .load()
+                              .type(UserMessage.class)
+                              .hybrid(true)
+                              .order("-created"), options);
+    }
   }
 
   @ApiMethod(name = "create",
@@ -96,11 +157,12 @@ public final class UnifiedService extends PlatformService {
     UserMessage messageObject;
 
     if (user != null) {
-      messageObject = new UserMessage(name, message, user.getEmail());
+      Account account = accountFromUser(user);
+      messageObject = new UserMessage(name, message, account);
     } else {
       messageObject = new UserMessage(name, message);
     }
-    datastore().save().entity(messageObject).now();
+    datastore().save().entity(messageObject);
     return publish(messageObject);
   }
 
@@ -118,7 +180,7 @@ public final class UnifiedService extends PlatformService {
                                      .key(messageKey.getKey())
                                      .now();
       if (messageObj == null) {
-        throw new NullPointerException();
+        throw new NullPointerException();  // caught below for 404
       }
 
     } catch (RuntimeException e) {

@@ -49,6 +49,9 @@
         <firebase.token.version>2.0.0</firebase.token.version>
         <appengine.pipelines.version>0.2.13</appengine.pipelines.version>
         <protostuff.version>1.3.8</protostuff.version>
+        <beanutils.version>1.9.2</beanutils.version>
+        <jackson.jsonschema.version>2.7.0</jackson.jsonschema.version>
+
 
         <!-- Libphonenumber -->
         <libphonenumber.version>7.2.2</libphonenumber.version>
@@ -160,6 +163,11 @@
             <version>${beanutils.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jsonSchema</artifactId>
+            <version>${jackson.jsonschema.version}</version>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${io.version}</version>
@@ -247,6 +255,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-jsonSchema</artifactId>
+            <version>${jackson.jsonschema.version}</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
@@ -372,7 +385,7 @@
         <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
-            <version>1.9.2</version>
+            <version>${beanutils.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.appengine</groupId>
