@@ -79,29 +79,25 @@ public final class MessagePipeline extends PlatformPipeline {
     }
 
     // calculate wordstats if so instructed
-    if (options.isEnableWordstats()) {
+    if (!options.isStreaming() && options.isEnableWordstats()) {
       PCollection<String> wordStats = messages.apply("Extract Words", ParDo.of(new ExtractMessageWords()))
                                               .apply("Count Words", Count.<String>perElement())
                                               .apply("Format for Word Report", ParDo.of(new FormatWordForStat()));
 
-      if (options.isStreaming()) {
-        // need to output this to pubsub, in windows
-        throw new RuntimeException("wordstats not yet supported in streaming mode");
-      } else {
-        // output stats to file
-        if (options.getStorageBucket() == null) throw new RuntimeException("you forgot your storage bucket ya doofus");
 
-        if (options.getStorageOutputFile() != null && !options.getDryRun()) {
-          // output via storage file
-          wordStats.apply(TextIO.Write.to(options.getStorageOutputFile())
-                                      .named("Write to Storage"));
+      // output stats to file
+      if (options.getStorageBucket() == null) throw new RuntimeException("you forgot your storage bucket ya doofus");
 
-        } else if (options.getStorageOutputPrefix() != null && !options.getDryRun()) {
-          // output via storage prefix
-          wordStats.apply(TextIO.Write.withShardNameTemplate(options.getStorageOutputPrefix())
-                                      .withSuffix("csv")
-                                      .named("Write to Storage"));
-        }
+      if (options.getStorageOutputFile() != null && !options.getDryRun()) {
+        // output via storage file
+        wordStats.apply(TextIO.Write.to(options.getStorageOutputFile())
+                                    .named("Write to Storage"));
+
+      } else if (options.getStorageOutputPrefix() != null && !options.getDryRun()) {
+        // output via storage prefix
+        wordStats.apply(TextIO.Write.withShardNameTemplate(options.getStorageOutputPrefix())
+                                    .withSuffix("csv")
+                                    .named("Write to Storage"));
       }
     }
     return pipeline;
