@@ -29,10 +29,6 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
   }
 
   public SerializedModel(AppModel model) {
-    this(model, false);
-  }
-
-  public SerializedModel(AppModel model, boolean removeNulls) {
     this.data = model;
 
     SerializedKey subject;
@@ -56,5 +52,10 @@ public final class SerializedModel extends SerializedDatastoreObject implements 
 
   public AppModel getData() {
     return data;
+  }
+
+  /** -- flattened models -- */
+  public FlatModel toFlatModel() {
+    return new FlatModel(this.kind, this.key, this.data.flatten());
   }
 }

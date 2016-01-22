@@ -39,8 +39,7 @@ public final class SystemAppService extends SystemService {
     this.isIllegalArgumentBackendError = isIllegalArgumentBackendError;
   }
 
-  public void invokeServiceMethod(Object service, Method method, ParamReader paramReader, ResultWriter resultWriter) throws
-                                                                                                                     IOException {
+  public void invokeServiceMethod(Object service, Method method, ParamReader paramReader, ResultWriter resultWriter) throws IOException {
     Object[] params;
     try {
       params = paramReader.read();

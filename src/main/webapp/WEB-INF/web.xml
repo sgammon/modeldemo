@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?><web-app xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.5" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
-        <servlet-name>AppServiceServlet</servlet-name>
+        <servlet-name>SystemServiceServlet</servlet-name>
         <servlet-class>io.momentum.demo.models.logic.servlets.services.AppServiceServlet</servlet-class>
         <init-param>
             <param-name>services</param-name>
-            <param-value>io.momentum.demo.models.service.unified.v1.UnifiedService</param-value>
+            <param-value>io.momentum.demo.models.service.unified.v1.MessageService,
+                         io.momentum.demo.models.service.accounts.v1.AccountService</param-value>
         </init-param>
     </servlet>
 
@@ -25,6 +26,16 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>PubsubEventServlet</servlet-name>
+        <servlet-class>io.momentum.demo.models.logic.servlets.internal.queue.pubsub.PubsubEventServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>PubsubEventServlet</servlet-name>
+        <url-pattern>/_internal/queue/pubsub</url-pattern>
+    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>LandingServlet</servlet-name>
         <url-pattern>/</url-pattern>
@@ -44,7 +55,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>AppServiceServlet</servlet-name>
+        <servlet-name>SystemServiceServlet</servlet-name>
         <url-pattern>/_ah/spi/*</url-pattern>
     </servlet-mapping>
 

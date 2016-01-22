@@ -6,6 +6,7 @@ import io.momentum.demo.models.logic.memcache.MemcacheLogic;
 import io.momentum.demo.models.logic.pubsub.PubsubLogic;
 import io.momentum.demo.models.logic.runtime.state.AppEnginePlatformState;
 import io.momentum.demo.models.logic.runtime.state.AppEngineRuntimeState;
+import io.momentum.demo.models.logic.taskqueue.TaskqueueLogic;
 
 
 /**
@@ -15,6 +16,7 @@ public final class PlatformBridge {
   private static PlatformBridge __singleton = null;
 
   /* appengine services */
+  public final TaskqueueLogic taskqueue;
   public final MemcacheLogic memcache;
   public final PubsubLogic pubsub;
 
@@ -22,6 +24,9 @@ public final class PlatformBridge {
   public final GoogleLogic google;
 
   protected PlatformBridge() {
+    taskqueue = new TaskqueueLogic();
+    taskqueue.setBridge(this);
+
     memcache = new MemcacheLogic();
     memcache.setBridge(this);
 

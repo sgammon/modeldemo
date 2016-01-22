@@ -9,6 +9,7 @@ import com.google.api.server.spi.config.ApiTransformer;
 import com.google.api.services.bigquery.model.TableFieldSchema;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.api.services.bigquery.model.TableSchema;
+import com.google.appengine.api.datastore.PropertyContainer;
 import com.google.cloud.dataflow.sdk.coders.AvroCoder;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
 import com.googlecode.objectify.*;
@@ -25,6 +26,7 @@ import org.apache.avro.Schema;
 import org.apache.commons.beanutils.BeanUtils;
 
 import io.momentum.demo.models.logic.runtime.datastore.DatastoreService;
+import io.momentum.demo.models.logic.service.models.FlatModel;
 import io.momentum.demo.models.logic.service.models.SerializedModel;
 import io.momentum.demo.models.logic.service.transformers.ModelTransformer;
 import io.momentum.demo.models.pipeline.PlatformCodec;
@@ -45,7 +47,6 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include;
  * Created by sam on 1/12/16.
  */
 @DefaultCoder(ModelCoder.class)
-@ApiTransformer(ModelTransformer.class)
 @JsonInclude(value = Include.ALWAYS)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NONE)
 public abstract class AppModel implements Serializable {
@@ -93,6 +94,10 @@ public abstract class AppModel implements Serializable {
   }
 
   /** -- internals -- **/
+  private @Ignore transient boolean _isExporting = false;
+  private void setExporting(boolean exportMode) {
+    this._isExporting = exportMode;
+  }
   protected static Objectify datastore() {
     return DatastoreService.ofy();
   }
@@ -110,9 +115,11 @@ public abstract class AppModel implements Serializable {
   public @Index @JsonProperty("modified") Date modified;
 
   public @OnSave void updateTimestamps() {
-    Date ts = new Date();
-    this.modified = ts;
-    if (this.created == null) this.created = ts;
+    if (!_isExporting) {
+      Date ts = new Date();
+      this.modified = ts;
+      if (this.created == null) this.created = ts;
+    }
   }
 
   /** -- getters/setters -- **/
@@ -129,12 +136,16 @@ public abstract class AppModel implements Serializable {
     return Key.create(this.getClass(), "1").getKind();
   }
 
-  public SerializedModel serialize() {
-    return new SerializedModel(this);
+  public Map<String, Object> flatten() {
+    this.setExporting(true);
+    com.google.appengine.api.datastore.Entity entity = datastore().save().toEntity(this);
+    this.setExporting(false);
+
+    return entity.getProperties();
   }
 
-  public SerializedModel serialize(boolean removeNulls) {
-    return new SerializedModel(this, removeNulls);
+  public SerializedModel serialize() {
+    return new SerializedModel(this);
   }
 
   @SuppressWarnings("unchecked")

@@ -12,7 +12,6 @@ import com.google.api.server.spi.request.ParamReader;
 import com.google.api.server.spi.request.ServletRequestParamReader;
 import com.google.api.server.spi.response.BadRequestException;
 import com.google.api.server.spi.response.ResultWriter;
-import com.google.api.server.spi.response.ServletResponseResultWriter;
 import com.google.appengine.repackaged.com.google.common.collect.UnmodifiableIterator;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import io.momentum.demo.models.logic.service.base.K9ResponseResultWriter;
 import io.momentum.demo.models.logic.service.base.SystemAppService;
 
 import java.io.IOException;
@@ -93,11 +93,11 @@ public final class AppServiceServlet extends HttpServlet {
   }
 
   private ResultWriter getResponseWriter(ApiSerializationConfig serializationConfig, HttpServletResponse response) {
-    return new ServletResponseResultWriter(response, serializationConfig);
+    return new K9ResponseResultWriter(response, serializationConfig);
   }
 
   private ResultWriter getErrorResponseWriter(HttpServletResponse response) {
-    return this.getResponseWriter((ApiSerializationConfig)null, response);
+    return this.getResponseWriter(null, response);
   }
 
   private String[] getPathParams(String path) {
@@ -125,10 +125,9 @@ public final class AppServiceServlet extends HttpServlet {
     ApiConfigAnnotationReader annotationReader = new ApiConfigAnnotationReader(typeLoader.getAnnotationTypes());
     if (EnvUtil.isRunningOnAppEngine()) {
       ApiConfigDatastoreReader datastoreReader = new ApiConfigDatastoreReader();
-      return new ApiConfigLoader(new ApiConfig.Factory(), typeLoader, annotationReader,
-                                 new ApiConfigSource[]{datastoreReader});
+      return new ApiConfigLoader(new ApiConfig.Factory(), typeLoader, annotationReader, datastoreReader);
     } else {
-      return new ApiConfigLoader(new ApiConfig.Factory(), typeLoader, annotationReader, new ApiConfigSource[0]);
+      return new ApiConfigLoader(new ApiConfig.Factory(), typeLoader, annotationReader);
     }
   }
 
@@ -156,17 +155,17 @@ public final class AppServiceServlet extends HttpServlet {
     try {
       return serviceClass.newInstance();
     } catch (InstantiationException var3) {
-      throw new RuntimeException(String.format("Cannot instantiate service class: %s", new Object[]{serviceClass.getName()}), var3);
+      throw new RuntimeException(String.format("Cannot instantiate service class: %s", serviceClass.getName()), var3);
     } catch (IllegalAccessException var4) {
-      throw new RuntimeException(String.format("Cannot access service class: %s", new Object[]{serviceClass.getName()}), var4);
+      throw new RuntimeException(String.format("Cannot access service class: %s", serviceClass.getName()), var4);
     }
   }
 
   private ClassLoader getUserClassLoader(ServletConfig config) throws ServletException {
     try {
       Class e = Class.forName("com.google.apphosting.utils.jetty.AppEngineWebAppContext$AppEngineServletContext");
-      Method method = e.getMethod("getClassLoader", new Class[0]);
-      return (ClassLoader) method.invoke(config.getServletContext(), new Object[0]);
+      Method method = e.getMethod("getClassLoader");
+      return (ClassLoader) method.invoke(config.getServletContext());
     } catch (ClassNotFoundException var4) {
       return this.getClass()
                  .getClassLoader();

@@ -63,7 +63,7 @@
         <google.plus.version>v1-rev318-1.21.0</google.plus.version>
         <google.guava.version>19.0</google.guava.version>
         <google.gcs-client.version>0.5</google.gcs-client.version>
-        <google.http-client-appengine.version>1.21.0</google.http-client-appengine.version>
+        <google.http-client-appengine.version>1.19.0</google.http-client-appengine.version>
         <google.api-client.version>1.21.0</google.api-client.version>
         <google.pubsub.version>v1-rev7-1.21.0</google.pubsub.version>
         <google.dataflow.version>v1beta3-rev2-1.19.1</google.dataflow.version>
@@ -396,6 +396,11 @@
             <groupId>com.google.appengine</groupId>
             <artifactId>appengine-tools-sdk</artifactId>
             <version>${appengine.target.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.http-client</groupId>
+            <artifactId>google-http-client</artifactId>
+            <version>${google.http-client-appengine.version}</version>
         </dependency>
     </dependencies>
 

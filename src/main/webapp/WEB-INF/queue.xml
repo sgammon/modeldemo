@@ -1,0 +1,25 @@
+<queue-entries>
+    <total-storage-limit>300M</total-storage-limit>
+    <queue>
+        <name>default</name>
+        <rate>5/s</rate>
+        <target>default</target>
+        <max-concurrent-requests>10</max-concurrent-requests>
+        <retry-parameters>
+            <task-retry-limit>7</task-retry-limit>
+            <task-age-limit>1d</task-age-limit>
+        </retry-parameters>
+    </queue>
+    <queue>
+        <name>pubsub</name>
+        <rate>32/s</rate>
+        <bucket-size>40</bucket-size>
+        <target>default</target>
+        <max-concurrent-requests>20</max-concurrent-requests>
+        <retry-parameters>
+            <min-backoff-seconds>10</min-backoff-seconds>
+            <max-backoff-seconds>200</max-backoff-seconds>
+            <max-doublings>4</max-doublings>
+        </retry-parameters>
+    </queue>
+</queue-entries>

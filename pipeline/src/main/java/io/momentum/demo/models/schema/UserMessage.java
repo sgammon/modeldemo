@@ -4,6 +4,7 @@ package io.momentum.demo.models.schema;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.google.api.server.spi.config.ApiTransformer;
 import com.google.api.services.bigquery.model.TableRow;
 import com.google.cloud.dataflow.sdk.coders.DefaultCoder;
 import com.googlecode.objectify.Key;
@@ -12,6 +13,7 @@ import com.googlecode.objectify.annotation.*;
 import io.protostuff.Tag;
 import org.apache.avro.reflect.Nullable;
 
+import io.momentum.demo.models.logic.service.transformers.RefSerializer;
 import io.momentum.demo.models.pipeline.coder.ModelCoder;
 
 
