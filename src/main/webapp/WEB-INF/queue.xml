@@ -1,5 +1,5 @@
 <queue-entries>
-    <total-storage-limit>300M</total-storage-limit>
+    <total-storage-limit>10M</total-storage-limit>
     <queue>
         <name>default</name>
         <rate>5/s</rate>
