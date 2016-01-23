@@ -55,10 +55,6 @@ public final class MessagePipeline extends PlatformPipeline {
 
   @Override
   protected Pipeline collapse(Pipeline pipeline) {
-    // add model coder stuff
-    //pipeline.getCoderRegistry().registerCoder(AppModel.class, ModelCoder.class);
-    //pipeline.getCoderRegistry().registerCoder(UserMessage.class, ModelCoder.class);
-
     // read and inflate user messages
     PCollection<UserMessage> messages;
     MessagesPipelineOptions options = pipeline.getOptions().as(MessagesPipelineOptions.class);

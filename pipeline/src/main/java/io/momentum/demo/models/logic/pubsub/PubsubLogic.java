@@ -162,8 +162,8 @@ public final class PubsubLogic extends PlatformLogic {
 
   /* -- internals: serialization -- */
   @SuppressWarnings("unchecked")
-  private <M extends AppModel> List<byte[]> encodeEntities(List<M> models) throws IOException {
-    List<byte[]> encodedEntities = new ArrayList(models.size());
+  private <M extends AppModel> List<String> encodeEntities(List<M> models) throws IOException {
+    List<String> encodedEntities = new ArrayList(models.size());
     HashMap<String, ModelCoder> modelCoders = new HashMap<>();
     ByteArrayOutputStream modelStream;
 
@@ -178,7 +178,7 @@ public final class PubsubLogic extends PlatformLogic {
       // encode model
       modelStream = new ByteArrayOutputStream();
       coder.encode(model, modelStream, Coder.Context.OUTER);
-      encodedEntities.add(modelStream.toByteArray());
+      encodedEntities.add(new String(modelStream.toByteArray()));
     }
     return encodedEntities;
   }
@@ -195,12 +195,12 @@ public final class PubsubLogic extends PlatformLogic {
     return _doFulfillPublish(topic, messages);
   }
 
-  private PublishResponse _doPublishBatch(Topic topic, List<byte[]> datum) throws IOException {
+  private PublishResponse _doPublishBatch(Topic topic, List<String> datum) throws IOException {
     List<PubsubMessage> messages = new ArrayList<>();
 
-    for (byte[] data : datum) {
+    for (String data : datum) {
       PubsubMessage message = new PubsubMessage();
-      message.encodeData(data);
+      message.setData(data);
       messages.add(message);
     }
 
@@ -217,7 +217,7 @@ public final class PubsubLogic extends PlatformLogic {
                       .execute();
   }
 
-  private void _doDelayedBatchPublish(Topic topic, List<byte[]> datum) throws IOException {
+  private void _doDelayedBatchPublish(Topic topic, List<String> datum) throws IOException {
     TaskqueueLogic.TaskMetadata metadata = new TaskqueueLogic.TaskMetadata();
     metadata.format = Task.TaskDataFormat.JSON;
     metadata.queue = new TaskqueueLogic.GenericAppQueue(queueName).name();
@@ -238,13 +238,7 @@ public final class PubsubLogic extends PlatformLogic {
   }
 
   public void relay(Topic topic, String data) throws IOException {
-    List<byte[]> oneshot = new ArrayList<>(1);
-    oneshot.add(data.getBytes(StandardCharsets.UTF_8));
-    _doDelayedBatchPublish(topic, oneshot);
-  }
-
-  public void relay(Topic topic, byte[] data) throws IOException {
-    List<byte[]> oneshot = new ArrayList<>(1);
+    List<String> oneshot = new ArrayList<>(1);
     oneshot.add(data);
     _doDelayedBatchPublish(topic, oneshot);
   }
@@ -254,9 +248,9 @@ public final class PubsubLogic extends PlatformLogic {
   }
 
   public void relayBatch(Topic topic, List<String> datum) throws IOException {
-    List<byte[]> encodedItems = new ArrayList<>();
+    List<String> encodedItems = new ArrayList<>();
     for (String data : datum) {
-      encodedItems.add(data.getBytes(StandardCharsets.UTF_8));
+      encodedItems.add(data);
     }
     _doDelayedBatchPublish(topic, encodedItems);
   }
@@ -273,16 +267,12 @@ public final class PubsubLogic extends PlatformLogic {
 
   @SuppressWarnings("unchecked")
   public <M extends AppModel> void relay(Topic topic, List<M> models) throws IOException {
-    List<byte[]> encodedEntities = encodeEntities(models);
+    List<String> encodedEntities = encodeEntities(models);
     _doDelayedBatchPublish(topic, encodedEntities);
   }
 
   /* -- API: publish -- */
   public PublishResponse publish(String topic, String data) throws IOException {
-    return publish(resolveTopic(buildTopicKey(topic)), data);
-  }
-
-  public PublishResponse publish(String topic, byte[] data) throws IOException {
     return publish(resolveTopic(buildTopicKey(topic)), data);
   }
 
@@ -293,31 +283,19 @@ public final class PubsubLogic extends PlatformLogic {
     return publish(topic, oneShotBatch);
   }
 
-  public PublishResponse publish(Topic topic, byte[] data) throws IOException {
-    return _doPublish(topic, data);
-  }
-
   public PublishResponse publish(String topic, List<String> data) throws IOException {
     return publish(resolveTopic(buildTopicKey(topic)), data);
   }
 
   public PublishResponse publish(Topic topic, List<String> data) throws IOException {
     // loop state
-    List<byte[]> datum = new ArrayList<>();
+    List<String> datum = new ArrayList<>();
 
     // pack each message
     for (String payload : data) {
       // allocate message and encode
-      datum.add(payload.getBytes(StandardCharsets.UTF_8));
+      datum.add(payload);
     }
-    return _doPublishBatch(topic, datum);
-  }
-
-  public PublishResponse publishRaw(String topic, List<byte[]> datum) throws IOException {
-    return publishRaw(resolveTopic(buildTopicKey(topic)), datum);
-  }
-
-  public PublishResponse publishRaw(Topic topic, List<byte[]> datum) throws IOException {
     return _doPublishBatch(topic, datum);
   }
 
@@ -331,13 +309,13 @@ public final class PubsubLogic extends PlatformLogic {
     byte[] bytestream = outputStream.toByteArray();
 
     // publish normally
-    return publish(topic, bytestream);
+    return publish(topic, new String(bytestream));
   }
 
   @SuppressWarnings("unchecked")
   public <M extends AppModel> PublishResponse publishEntities(String topic, List<M> models) throws IOException {
     // encode object
-    List<byte[]> byteArraySet = encodeEntities(models);
+    List<String> byteArraySet = encodeEntities(models);
     return _doPublishBatch(resolveTopic(buildTopicKey(topic)), byteArraySet);
   }
 }

@@ -94,7 +94,7 @@ public final class TaskqueueLogic extends PlatformLogic {
       format = Task.TaskDataFormat.valueOf(request.getHeader(K9HeaderNames.FORMAT));
       taskRetries = safeParseLong(GoogleHeaderNames.TASK_RETRIES, request);
       taskExecutions = safeParseLong(GoogleHeaderNames.TASK_EXECUTIONS, request);
-      taskETA = safeParseLong(GoogleHeaderNames.TASK_ETA, request);
+      taskETA = Long.valueOf((long)safeParseDouble(GoogleHeaderNames.TASK_ETA, request));
       failFast = (request.getHeader(GoogleHeaderNames.TASK_FAILFAST) != null);
     }
 

@@ -108,8 +108,8 @@
         <maven.bundle.version>2.5.4</maven.bundle.version>
         <maven.jacoco.version>0.7.5.201505241946</maven.jacoco.version>
 
-        <app.id>your-app-id</app.id>
-        <app.version>1</app.version>
+        <app.id>mm-api-demo</app.id>
+        <app.version>v2</app.version>
         <appengine.version>1.9.31</appengine.version>
         <gcloud.plugin.version>2.0.9.74.v20150814</gcloud.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

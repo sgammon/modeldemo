@@ -66,6 +66,7 @@ public abstract class AppModel implements Serializable {
     private final FieldType type;
     private final boolean nullable;
     private final boolean repeated;
+    private final List<FieldSchema> fields;
 
     private FieldSchema(FieldType type,
                         boolean nullable,
@@ -73,6 +74,16 @@ public abstract class AppModel implements Serializable {
       this.type = type;
       this.nullable = nullable;
       this.repeated = repeated;
+      this.fields = null;  // a non-record type doesn't have fields
+    }
+
+    private FieldSchema(boolean nullable,
+                        boolean repeated,
+                        List<FieldSchema> fields) {
+      this.type = FieldType.RECORD;
+      this.nullable = nullable;
+      this.repeated = repeated;
+      this.fields = fields;
     }
 
     private static FieldSchema nullable(FieldType type) {
@@ -85,6 +96,14 @@ public abstract class AppModel implements Serializable {
 
     private static FieldSchema notNullable(FieldType type) {
       return new FieldSchema(type, false, false);
+    }
+
+    private static FieldSchema record(List<FieldSchema> fields) {
+      return record(fields, false);
+    }
+
+    private static FieldSchema record(List<FieldSchema> fields, boolean repeated) {
+      return new FieldSchema(false, repeated, fields);
     }
 
     @Override
@@ -212,6 +231,29 @@ public abstract class AppModel implements Serializable {
         Schema elementSchema = schema.getElementType();
         FieldSchema subschema = resolveTypeForTableRow(elementSchema);
         return FieldSchema.repeated(subschema.type);
+
+      case RECORD:
+        if (schema.getNamespace().equals("com.googlecode.objectify") &&
+           (schema.getName().equals("Ref") || schema.getName().equals("Key"))) {
+          // it's a `Ref` or a `Key` object
+          return FieldSchema.notNullable(FieldType.STRING);
+
+        } else {
+          // it's a record with its own fields
+          List<Schema.Field> fields = schema.getFields();
+          List<FieldSchema> fieldSchemas = new ArrayList<>(fields.size());
+          for (Schema.Field field : fields) {
+            // add a subfield for each
+            FieldSchema fieldSubschema = resolveTypeForTableRow(field.schema());
+            if (fieldSubschema != null) {
+              fieldSchemas.add(fieldSubschema);
+            } else {
+              throw new RuntimeException("unable to resolve type for table row: sub-field '" + field.name() +
+                                             "' of record '" + schema.getName() + "'.");
+            }
+          }
+          return FieldSchema.record(fieldSchemas);
+        }
 
       case UNION:
         // it's likely nullable
