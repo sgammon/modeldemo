@@ -9,7 +9,7 @@ import io.momentum.demo.models.logic.service.models.QueryOptions;
 /**
  * Created by sam on 1/12/16.
  */
-public class QueryOptionsTransformer implements Transformer<QueryOptions, String> {
+public final class QueryOptionsTransformer implements Transformer<QueryOptions, String> {
   @Override
   public QueryOptions transformFrom(String s) {
     return null;

@@ -30,11 +30,17 @@ public abstract class PlatformPipeline extends BasePipeline {
    **/
   public static String topicForInput(PubsubInputOptions options) {
     // @TODO: cross-project pubsub
+    if (options.getPubsubInputTopic() == null) {
+      throw new IllegalArgumentException("PubSub streaming input requires input topic.");
+    }
     return "projects/" + options.as(GcpOptions.class).getProject() + "/topics/" + options.getPubsubInputTopic();
   }
 
   public static String topicForOutput(PubsubOutputOptions options) {
     // @TODO: cross-project pubsub
+    if (options.getPubsubOutputTopic() == null) {
+      throw new IllegalArgumentException("PubSub streaming output requires output topic.");
+    }
     return "projects/" + options.as(GcpOptions.class).getProject() + "/topics/" + options.getPubsubOutputTopic();
   }
 

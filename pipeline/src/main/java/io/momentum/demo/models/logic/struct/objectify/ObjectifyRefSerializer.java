@@ -15,11 +15,9 @@ import java.io.IOException;
 public class ObjectifyRefSerializer<T> extends JsonSerializer<Ref<T>> {
   @Override
   public void serialize(Ref<T> value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    T t = value.getValue();
-    if (t != null) {
-      gen.writeObject(t);
-    } else {
-      gen.writeString(value.getKey().getString());
-    }
+    if (value == null || value.getKey() == null)
+      gen.writeNull();
+    else
+      gen.writeString(value.getKey().toWebSafeString());
   }
 }

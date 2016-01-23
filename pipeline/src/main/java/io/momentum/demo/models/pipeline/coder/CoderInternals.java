@@ -1,14 +1,8 @@
 package io.momentum.demo.models.pipeline.coder;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.cloud.dataflow.sdk.coders.Coder;
-import com.googlecode.objectify.ObjectifyService;
 
-import io.momentum.demo.models.logic.runtime.datastore.DatastoreService;
 import io.momentum.demo.models.logic.service.models.SerializedModel;
 import io.momentum.demo.models.pipeline.PlatformCodec;
 import io.momentum.demo.models.schema.AppModel;

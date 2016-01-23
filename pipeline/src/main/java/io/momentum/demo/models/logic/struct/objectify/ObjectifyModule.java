@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Ref;
+import com.googlecode.objectify.impl.ref.LiveRef;
 
 
 /**
@@ -15,7 +16,8 @@ public final class ObjectifyModule extends SimpleModule {
   @SuppressWarnings({"rawtypes", "unchecked"})
   public ObjectifyModule() {
     super("ObjectifyModule", new Version(1, 0, 0, null));
-    addSerializer(Ref.class, new ObjectifyRefSerializer());
     addSerializer(Key.class, new ObjectifyKeySerializer());
+    addSerializer(Ref.class, new ObjectifyRefSerializer());
+    addSerializer(LiveRef.class, new ObjectifyRefSerializer());
   }
 }

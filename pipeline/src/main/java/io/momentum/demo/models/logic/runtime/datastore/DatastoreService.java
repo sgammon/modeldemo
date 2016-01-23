@@ -5,6 +5,7 @@ import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyFactory;
 import com.googlecode.objectify.ObjectifyService;
 
+import io.momentum.demo.models.schema.Account;
 import io.momentum.demo.models.schema.AppModel;
 import io.momentum.demo.models.schema.UserMessage;
 
@@ -44,6 +45,7 @@ public final class DatastoreService {
 
   public static void initialize() {
     if (!initialized) {
+      register(Account.class);
       register(UserMessage.class);
 
       initialized = true;

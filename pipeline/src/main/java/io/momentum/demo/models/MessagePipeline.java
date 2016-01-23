@@ -11,10 +11,12 @@ import com.google.cloud.dataflow.sdk.transforms.*;
 import com.google.cloud.dataflow.sdk.values.KV;
 import com.google.cloud.dataflow.sdk.values.PCollection;
 import com.googlecode.objectify.Key;
+import com.googlecode.objectify.Ref;
 
 import io.momentum.demo.models.pipeline.PlatformPipeline;
 import io.momentum.demo.models.pipeline.coder.ModelCoder;
 import io.momentum.demo.models.pipeline.options.*;
+import io.momentum.demo.models.schema.Account;
 import io.momentum.demo.models.schema.AppModel;
 import io.momentum.demo.models.schema.UserMessage;
 
@@ -53,10 +55,6 @@ public final class MessagePipeline extends PlatformPipeline {
 
   @Override
   protected Pipeline collapse(Pipeline pipeline) {
-    // add model coder stuff
-    //pipeline.getCoderRegistry().registerCoder(AppModel.class, ModelCoder.class);
-    //pipeline.getCoderRegistry().registerCoder(UserMessage.class, ModelCoder.class);
-
     // read and inflate user messages
     PCollection<UserMessage> messages;
     MessagesPipelineOptions options = pipeline.getOptions().as(MessagesPipelineOptions.class);
@@ -77,29 +75,25 @@ public final class MessagePipeline extends PlatformPipeline {
     }
 
     // calculate wordstats if so instructed
-    if (options.isEnableWordstats()) {
+    if (!options.isStreaming() && options.isEnableWordstats()) {
       PCollection<String> wordStats = messages.apply("Extract Words", ParDo.of(new ExtractMessageWords()))
                                               .apply("Count Words", Count.<String>perElement())
                                               .apply("Format for Word Report", ParDo.of(new FormatWordForStat()));
 
-      if (options.isStreaming()) {
-        // need to output this to pubsub, in windows
-        throw new RuntimeException("wordstats not yet supported in streaming mode");
-      } else {
-        // output stats to file
-        if (options.getStorageBucket() == null) throw new RuntimeException("you forgot your storage bucket ya doofus");
 
-        if (options.getStorageOutputFile() != null && !options.getDryRun()) {
-          // output via storage file
-          wordStats.apply(TextIO.Write.to(options.getStorageOutputFile())
-                                      .named("Write to Storage"));
+      // output stats to file
+      if (options.getStorageBucket() == null) throw new RuntimeException("you forgot your storage bucket ya doofus");
 
-        } else if (options.getStorageOutputPrefix() != null && !options.getDryRun()) {
-          // output via storage prefix
-          wordStats.apply(TextIO.Write.withShardNameTemplate(options.getStorageOutputPrefix())
-                                      .withSuffix("csv")
-                                      .named("Write to Storage"));
-        }
+      if (options.getStorageOutputFile() != null && !options.getDryRun()) {
+        // output via storage file
+        wordStats.apply(TextIO.Write.to(options.getStorageOutputFile())
+                                    .named("Write to Storage"));
+
+      } else if (options.getStorageOutputPrefix() != null && !options.getDryRun()) {
+        // output via storage prefix
+        wordStats.apply(TextIO.Write.withShardNameTemplate(options.getStorageOutputPrefix())
+                                    .withSuffix("csv")
+                                    .named("Write to Storage"));
       }
     }
     return pipeline;
@@ -159,8 +153,10 @@ public final class MessagePipeline extends PlatformPipeline {
       TableRow row = c.element();
       String name = (String)row.get("name");
       String message = (String)row.get("message");
-      String email = (String)row.get("email");
-      UserMessage messageObject = new UserMessage(name, message, email);
+      String encodedAccountKey = (String)row.get("account");
+
+      Key<Account> accountKey = Key.create(encodedAccountKey);
+      UserMessage messageObject = new UserMessage(name, message, Ref.create(accountKey));
 
       // carry over key ID
       String encodedKey = (String)row.get("key");
